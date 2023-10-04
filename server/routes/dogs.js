@@ -1,4 +1,9 @@
-// ------------------------------  SERVER DATA ------------------------------  
+// ------------------------------  Boiler PLate Code ------------------------
+
+const express = require('express');
+const router = express.Router();
+
+// ------------------------------  SERVER DATA ------------------------------
 
 let nextDogId = 1;
 function getNewDogId() {
@@ -18,7 +23,7 @@ const dogs = [
   }
 ];
 
-// ------------------------------  MIDDLEWARES ------------------------------ 
+// ------------------------------  MIDDLEWARES ------------------------------
 
 const validateDogInfo = (req, res, next) => {
   if (!req.body || !req.body.name) {
@@ -40,7 +45,8 @@ const validateDogId = (req, res, next) => {
   next();
 }
 
-// ------------------------------  ROUTE HANDLERS ------------------------------  
+
+// ------------------------------  ROUTE HANDLERS ------------------------------
 
 // GET /dogs
 const getAllDogs = (req, res) => {
@@ -82,6 +88,32 @@ const deleteDog = (req, res) => {
   res.json({ message: "success" });
 };
 
-// ------------------------------  ROUTER ------------------------------  
+// ------------------------------  ROUTER ------------------------------
+// GET all dogs
+router.get('/', getAllDogs);
+
+router.use('/:dogId', validateDogId);
+
+// When a request is sent to /dogs/:dogId, the validateDogId middleware will run
+// but when a request is sent to /dogs, the validateDogId middleware wont run because
+// the endpoint /dogs/:dogId doesnt match /dogs. On the other hand if we had defined
+// the /dogs middleware in place of /dogs/:dogId middleware, that middleware would run
+// even for requset to /dogs/:dogId because it matches that route i.e. /dog is a substring
+// of /dogs/:dogId just for the sake of analogy
+
+// GET a single dog by Id
+router.get('/:dogId', getDogById);
+
+// POST a new dog
+router.post('/', validateDogInfo, createDog);
+
+//PUT i.e. update a dog
+router.put('/:dogId', validateDogInfo, updateDog)
+
+
+//DELETE a dog based on id
+router.delete('/:dogId', deleteDog)
 
 // Your code here
+
+module.exports = router;
